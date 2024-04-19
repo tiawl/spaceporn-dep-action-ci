@@ -19,12 +19,12 @@ runs:
         printf 'tmp=%s\n' "$(mktemp -d)" >> ${GITHUB_OUTPUT}
         printf 'hash=%s\n' "$(zig fetch .)" >> ${GITHUB_OUTPUT}
 
-    - name: Clone ${{ user }}.zig
+    - name: Clone ${{ inputs.user }}.zig
       shell: bash
       run: |
-        git clone "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ user }}.zig.git" ${{ steps.vars.outputs.tmp }}
+        git clone "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.zig.git" ${{ steps.vars.outputs.tmp }}
 
-    - name: Prepare ${{ user }}.zig/build.zig.zon
+    - name: Prepare ${{ inputs.user }}.zig/build.zig.zon
       working-directory: ${{ steps.vars.outputs.tmp }}
       shell: bash
       run: |
@@ -33,7 +33,7 @@ runs:
         sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/archive/${GITHUB_SHA}.tar.gz@;
                 s@${zon_hash}@${{ steps.vars.outputs.hash }}@" build.zig.zon
 
-    - name: Build ${{ user }}.zig
+    - name: Build ${{ inputs.user }}.zig
       working-directory: ${{ steps.vars.outputs.tmp }}
       shell: bash
       run:
