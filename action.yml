@@ -30,7 +30,7 @@ runs:
     - name: Clone ${{ inputs.user }}.zig
       shell: ${{ env.shell }}
       run: |
-        git clone "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.zig.git" ${{ steps.vars.outputs.tmp }}
+        git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.zig.git" ${{ steps.vars.outputs.tmp }}
 
     - name: Prepare ${{ inputs.user }}.zig/build.zig.zon
       working-directory: ${{ steps.vars.outputs.tmp }}
