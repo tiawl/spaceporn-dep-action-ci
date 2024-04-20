@@ -4,6 +4,15 @@ inputs:
   user:
     description: 'User of the dependency'
     required: true
+  test_build:
+    description: 'Do we test `zig build` command ?'
+    required: true
+  test_update:
+    description: 'Do we test `zig build -Dupdate` command ?'
+    required: true
+  test_fetch:
+    description: 'Do we test `zig build -Dfetch` command ?'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -32,12 +41,12 @@ runs:
         printf 'tmp=%s\n' "$(mktemp -d)" >> ${GITHUB_OUTPUT}
         printf 'hash=%s\n' "$(zig fetch .)" >> ${GITHUB_OUTPUT}
 
-    - name: Clone ${{ inputs.user }}.zig
+    - name: Clone ${{ inputs.user }}
       shell: ${{ env.shell }}
       run: |
-        git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.zig.git" ${{ steps.vars.outputs.tmp }}
+        git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.git" ${{ steps.vars.outputs.tmp }}
 
-    - name: Prepare ${{ inputs.user }}.zig/build.zig.zon
+    - name: Prepare ${{ inputs.user }}/build.zig.zon
       working-directory: ${{ steps.vars.outputs.tmp }}
       shell: ${{ env.shell }}
       run: |
@@ -46,8 +55,23 @@ runs:
         sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/archive/${GITHUB_SHA}.tar.gz@;
                 s@${zon_hash}@${{ steps.vars.outputs.hash }}@" build.zig.zon
 
-    - name: Build ${{ inputs.user }}.zig
+    - name: Test building ${{ inputs.user }}
+      if: ${{ inputs.test_build == 'true' }}
+      working-directory: ${{ steps.vars.outputs.tmp }}
+      shell: ${{ env.shell }}
+      run:
+        zig build
+
+    - name: Test updating ${{ inputs.user }}
+      if: ${{ inputs.test_update == 'true' }}
       working-directory: ${{ steps.vars.outputs.tmp }}
       shell: ${{ env.shell }}
       run:
         zig build -Dupdate
+
+    - name: Test fetching ${{ inputs.user }}
+      if: ${{ inputs.test_fetch == 'true' }}
+      working-directory: ${{ steps.vars.outputs.tmp }}
+      shell: ${{ env.shell }}
+      run:
+        zig build -Dfetch
