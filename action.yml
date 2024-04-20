@@ -75,3 +75,5 @@ runs:
       shell: ${{ env.shell }}
       run:
         zig build -Dfetch
+      env:
+        GH_TOKEN: ${{ github.token }}
