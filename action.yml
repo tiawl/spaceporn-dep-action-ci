@@ -15,10 +15,15 @@ runs:
       with:
         version: ${{ env.zig_version }}
 
-    - name: Install packages
+    - name: Install apt packages
       shell: ${{ env.shell }}
       run: |
-        sudo apt-get install -y ${{ env.packages }}
+        sudo apt-get install -y ${{ env.apt_packages }}
+
+    - name: Install pip packages
+      shell: ${{ env.shell }}
+      run: |
+        pip3 install ${{ env.pip_packages }}
 
     - name: Set variables
       id: vars
