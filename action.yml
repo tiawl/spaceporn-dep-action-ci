@@ -1,5 +1,5 @@
 name: 'CI'
-description: 'Clone the user of the dependency, change its build.zig.zon and test its update option'
+description: 'Clone the user of the dependency, change its build.zig.zon and apply some tests'
 inputs:
   user:
     description: 'User of the dependency'
@@ -38,13 +38,13 @@ runs:
       id: vars
       shell: ${{ env.shell }}
       run: |
-        printf 'tmp=%s\n' "$(mktemp -d)" >> ${GITHUB_OUTPUT}
-        printf 'hash=%s\n' "$(zig fetch .)" >> ${GITHUB_OUTPUT}
+        printf 'tmp=%s\n' "$(mktemp -d)" >> "${GITHUB_OUTPUT}"
+        printf 'hash=%s\n' "$(zig fetch .)" >> "${GITHUB_OUTPUT}"
 
     - name: Clone ${{ inputs.user }}
       shell: ${{ env.shell }}
       run: |
-        git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.git" ${{ steps.vars.outputs.tmp }}
+        git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.git" "${{ steps.vars.outputs.tmp }}"
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
       working-directory: ${{ steps.vars.outputs.tmp }}
