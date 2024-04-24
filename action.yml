@@ -68,9 +68,9 @@ runs:
       working-directory: ${{ steps.clone.outputs.user }}
       shell: ${{ env.shell }}
       run: |
-        zon_url="$(grep -o "${GITHUB_SERVER_URL}/${step.dep.outputs.repository}/archive/.*\.tar\.gz" build.zig.zon)"
+        zon_url="$(grep -o "${GITHUB_SERVER_URL}/${{ steps.dep.outputs.repository }}/archive/.*\.tar\.gz" build.zig.zon)"
         zon_hash="$(zig fetch "${zon_url}")"
-        sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${step.dep.outputs.repository}/archive/${GITHUB_SHA}.tar.gz@;
+        sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${{ steps.dep.outputs.repository }}/archive/${GITHUB_SHA}.tar.gz@;
                 s@${zon_hash}@${{ steps.dep.outputs.hash }}@" build.zig.zon
 
     - name: Test building ${{ inputs.user }}
