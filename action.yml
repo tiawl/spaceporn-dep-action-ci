@@ -52,8 +52,10 @@ runs:
         if [[ -n "${{ inputs.dep }}" ]]
         then
           git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.dep }}.git" "${{ steps.clone.outputs.dep }}"
+          printf 'repository=%s\n' "${GITHUB_REPOSITORY_OWNER}/${{ inputs.dep }}" >> "${GITHUB_OUTPUT}"
           printf 'hash=%s\n' "$(zig fetch "${{ steps.clone.outputs.dep }}")" >> "${GITHUB_OUTPUT}"
         else
+          printf 'repository=%s\n' "${GITHUB_REPOSITORY}" >> "${GITHUB_OUTPUT}"
           printf 'hash=%s\n' "$(zig fetch .)" >> "${GITHUB_OUTPUT}"
         fi
 
@@ -66,9 +68,9 @@ runs:
       working-directory: ${{ steps.clone.outputs.user }}
       shell: ${{ env.shell }}
       run: |
-        zon_url="$(grep -o "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/archive/.*\.tar\.gz" build.zig.zon)"
+        zon_url="$(grep -o "${GITHUB_SERVER_URL}/${step.dep.outputs.repository}/archive/.*\.tar\.gz" build.zig.zon)"
         zon_hash="$(zig fetch "${zon_url}")"
-        sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/archive/${GITHUB_SHA}.tar.gz@;
+        sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${step.dep.outputs.repository}/archive/${GITHUB_SHA}.tar.gz@;
                 s@${zon_hash}@${{ steps.dep.outputs.hash }}@" build.zig.zon
 
     - name: Test building ${{ inputs.user }}
