@@ -21,6 +21,9 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
+      with:
+        repository: "${{ inputs.dep == '' && github.repository || join ([github.repository_owner, inputs.dep], '/') }}"
+
     - uses: tiawl/spaceporn-dep-action-env@v1
 
     - name: Setup Zig
@@ -38,57 +41,44 @@ runs:
       run: |
         pip3 install ${{ env.pip_packages }}
 
-    - name: Build temporary directories for clone
-      id: clone
+    - name: Set variables
+      id: vars
       shell: ${{ env.shell }}
       run: |
         printf 'user=%s\n' "$(mktemp -d)" >> "${GITHUB_OUTPUT}"
-
-    - name: Clone and fetch ${{ inputs.dep == '' && github.event.repository.name || inputs.dep }}
-      id: dep
-      shell: ${{ env.shell }}
-      run: |
-        if [[ -n "${{ inputs.dep }}" ]]
-        then
-          repository="${GITHUB_REPOSITORY_OWNER}/${{ inputs.dep }}"
-          dep="$(mktemp -d)"
-          git clone --recurse-submodules "${GITHUB_SERVER_URL}/${repository}.git" "${dep}"
-          cd "${dep}"
-        fi
-        printf 'repository=%s\n' "${repository:-"${GITHUB_REPOSITORY}"}" >> "${GITHUB_OUTPUT}"
         printf 'hash=%s\n' "$(zig fetch .)" >> "${GITHUB_OUTPUT}"
 
     - name: Clone ${{ inputs.user }}
       shell: ${{ env.shell }}
       run: |
-        git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.git" "${{ steps.clone.outputs.user }}"
+        git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.git" "${{ steps.vars.outputs.user }}"
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
-      working-directory: ${{ steps.clone.outputs.user }}
+      working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run: |
-        zon_url="$(grep -o "${GITHUB_SERVER_URL}/${{ steps.dep.outputs.repository }}/archive/.*\.tar\.gz" build.zig.zon)"
+        zon_url="$(grep -o "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/archive/.*\.tar\.gz" build.zig.zon)"
         zon_hash="$(zig fetch "${zon_url}")"
-        sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${{ steps.dep.outputs.repository }}/archive/${GITHUB_SHA}.tar.gz@;
-                s@${zon_hash}@${{ steps.dep.outputs.hash }}@" build.zig.zon
+        sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/archive/${GITHUB_SHA}.tar.gz@;
+                s@${zon_hash}@${{ steps.vars.outputs.hash }}@" build.zig.zon
 
     - name: Test building ${{ inputs.user }}
       if: ${{ inputs.test_build == 'true' }}
-      working-directory: ${{ steps.clone.outputs.user }}
+      working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run:
         zig build
 
     - name: Test updating ${{ inputs.user }}
       if: ${{ inputs.test_update == 'true' }}
-      working-directory: ${{ steps.clone.outputs.user }}
+      working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run:
         zig build -Dupdate
 
     - name: Test fetching ${{ inputs.user }}
       if: ${{ inputs.test_fetch == 'true' }}
-      working-directory: ${{ steps.clone.outputs.user }}
+      working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run:
         zig build -Dfetch
