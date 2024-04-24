@@ -45,7 +45,7 @@ runs:
         printf 'user=%s\n' "$(mktemp -d)" >> "${GITHUB_OUTPUT}"
         printf 'dep=%s\n' "$(mktemp -d)" >> "${GITHUB_OUTPUT}"
 
-    - name: Clone and fetch ${{ inputs.dep == '' && || inputs.dep }}
+    - name: Clone and fetch ${{ inputs.dep == '' && github.event.repository.name || inputs.dep }}
       id: dep
       shell: ${{ env.shell }}
       run: |
