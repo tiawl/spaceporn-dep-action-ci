@@ -1,10 +1,6 @@
 name: 'CI'
 description: 'Clone the user of the dependency, change its build.zig.zon and apply some tests'
 inputs:
-  dep:
-    description: 'The dependency'
-    required: false
-    default: ''
   user:
     description: 'User of the dependency'
     required: true
@@ -20,10 +16,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: "${{ inputs.dep == '' && github.repository || join ([github.repository_owner, inputs.dep], '/') }}"
-
     - uses: tiawl/spaceporn-dep-action-env@v1
 
     - name: Setup Zig

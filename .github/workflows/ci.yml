@@ -44,9 +44,12 @@ jobs:
             dep: shaderc.zig
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: "${{ format ('{0}/{1}', github.repository_owner, matrix.repo.dep) }}"
+
     - uses: tiawl/spaceporn-dep-action-ci@ci
       with:
-        dep: "${{ matrix.repo.dep }}"
         user: "${{ matrix.repo.user }}"
         test_build: ${{ matrix.repo.user == 'spaceporn' && 'true' || 'false' }}
         test_update: ${{ matrix.repo.user == 'spaceporn' && 'false' || 'true' }}
