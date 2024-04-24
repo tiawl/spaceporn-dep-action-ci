@@ -44,9 +44,19 @@ jobs:
             dep: shaderc.zig
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: "${{ format ('{0}/{1}', github.repository_owner, matrix.repo.dep) }}"
+
+    - name: Prepare CI
+      id: prepare
+      run: |
+        printf 'sha=%s\n' "$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
+
     - uses: tiawl/spaceporn-dep-action-ci@ci
       with:
-        dep: "${{ matrix.repo.dep }}"
+        repository: "${{ format ('{0}/{1}', github.repository_owner, matrix.repo.dep) }}"
+        sha: "${{ steps.prepare.outputs.sha }}"
         user: "${{ matrix.repo.user }}"
         test_build: ${{ matrix.repo.user == 'spaceporn' && 'true' || 'false' }}
         test_update: ${{ matrix.repo.user == 'spaceporn' && 'false' || 'true' }}
