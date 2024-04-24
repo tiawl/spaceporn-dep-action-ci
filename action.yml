@@ -43,7 +43,6 @@ runs:
       shell: ${{ env.shell }}
       run: |
         printf 'user=%s\n' "$(mktemp -d)" >> "${GITHUB_OUTPUT}"
-        printf 'dep=%s\n' "$(mktemp -d)" >> "${GITHUB_OUTPUT}"
 
     - name: Clone and fetch ${{ inputs.dep == '' && github.event.repository.name || inputs.dep }}
       id: dep
@@ -51,13 +50,13 @@ runs:
       run: |
         if [[ -n "${{ inputs.dep }}" ]]
         then
-          git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.dep }}.git" "${{ steps.clone.outputs.dep }}"
-          printf 'repository=%s\n' "${GITHUB_REPOSITORY_OWNER}/${{ inputs.dep }}" >> "${GITHUB_OUTPUT}"
-          printf 'hash=%s\n' "$(zig fetch "${{ steps.clone.outputs.dep }}")" >> "${GITHUB_OUTPUT}"
-        else
-          printf 'repository=%s\n' "${GITHUB_REPOSITORY}" >> "${GITHUB_OUTPUT}"
-          printf 'hash=%s\n' "$(zig fetch .)" >> "${GITHUB_OUTPUT}"
+          repository="${GITHUB_REPOSITORY_OWNER}/${{ inputs.dep }}"
+          dep="$(mktemp -d)"
+          git clone --recurse-submodules "${GITHUB_SERVER_URL}/${repository}.git" "${dep}"
+          cd "${dep}"
         fi
+        printf 'repository=%s\n' "${repository:-"${GITHUB_REPOSITORY}"}" >> "${GITHUB_OUTPUT}"
+        printf 'hash=%s\n' "$(zig fetch .)" >> "${GITHUB_OUTPUT}"
 
     - name: Clone ${{ inputs.user }}
       shell: ${{ env.shell }}
