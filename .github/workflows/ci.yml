@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  pull_request:
+    branches:
+      - trunk
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        repo:
+          - vulkan.zig
+          - wayland.zig
+          - X11.zig
+          - glfw.zig
+          - cimgui.zig
+          - spirv.zig
+          - glslang.zig
+          - shaderc.zig
+          - spaceporn
+    runs-on: ubuntu-latest
+    steps:
+    - uses: tiawl/spaceporn-dep-action-ci@ci
+      with:
+        user: "${{ matrix.repo }}"
+        test_build: ${{ "${{ matrix.repo }}" == 'spaceporn' && 'true' || 'false' }}
+        test_update: ${{ "${{ matrix.repo }}" == 'spaceporn' && 'false' || 'true' }}
+        test_fetch: ${{ "${{ matrix.repo }}" == 'spaceporn' && 'false' || 'true' }}
