@@ -24,6 +24,6 @@ jobs:
     - uses: tiawl/spaceporn-dep-action-ci@ci
       with:
         user: "${{ matrix.repo }}"
-        test_build: ${{ "${{ matrix.repo }}" == 'spaceporn' && 'true' || 'false' }}
-        test_update: ${{ "${{ matrix.repo }}" == 'spaceporn' && 'false' || 'true' }}
-        test_fetch: ${{ "${{ matrix.repo }}" == 'spaceporn' && 'false' || 'true' }}
+        test_build: ${{ matrix.repo == 'spaceporn' && 'true' || 'false' }}
+        test_update: ${{ matrix.repo == 'spaceporn' && 'false' || 'true' }}
+        test_fetch: ${{ matrix.repo == 'spaceporn' && 'false' || 'true' }}
