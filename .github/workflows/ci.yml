@@ -48,8 +48,15 @@ jobs:
       with:
         repository: "${{ format ('{0}/{1}', github.repository_owner, matrix.repo.dep) }}"
 
+    - name: Prepare CI
+      id: prepare
+      run: |
+        printf 'sha=%s\n' "$(git rev-parse HEAD)" >> "${{ GITHUB_OUTPUT }}"
+
     - uses: tiawl/spaceporn-dep-action-ci@ci
       with:
+        repository: "${{ format ('{0}/{1}', github.repository_owner, matrix.repo.dep) }}"
+        sha: "${{ steps.prepare.outputs.sha }}"
         user: "${{ matrix.repo.user }}"
         test_build: ${{ matrix.repo.user == 'spaceporn' && 'true' || 'false' }}
         test_update: ${{ matrix.repo.user == 'spaceporn' && 'false' || 'true' }}

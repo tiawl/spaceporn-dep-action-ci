@@ -1,6 +1,12 @@
 name: 'CI'
 description: 'Clone the user of the dependency, change its build.zig.zon and apply some tests'
 inputs:
+  repository:
+    description: 'Current repository'
+    required: true
+  sha:
+    description: 'Current commit sha'
+    required: true
   user:
     description: 'User of the dependency'
     required: true
