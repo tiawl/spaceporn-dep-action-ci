@@ -10,6 +10,9 @@ inputs:
   user:
     description: 'User of the dependency'
     required: true
+  token:
+    description: 'The github token'
+    required: true
   test_build:
     description: 'Do we test `zig build` command ?'
     required: true
@@ -81,4 +84,4 @@ runs:
       run:
         zig build -Dfetch
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ inputs.token }}
