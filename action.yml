@@ -33,55 +33,68 @@ runs:
         version: ${{ env.zig_version }}
 
     - name: Install apt packages
+      env:
+        PACKAGES: "${{ env.apt_packages }}"
       shell: ${{ env.shell }}
       run: |
-        sudo apt-get install -y ${{ env.apt_packages }}
+        sudo apt-get install -y ${PACKAGES}
 
     - name: Install pip packages
+      env:
+        PACKAGES: "${{ env.pip_packages }}"
       shell: ${{ env.shell }}
       run: |
-        pip3 install ${{ env.pip_packages }}
+        pip3 install ${PACKAGES}
 
     - name: Set variables
       id: vars
       shell: ${{ env.shell }}
       run: |
-        printf 'user=%s\n' "$(mktemp -d)" >> "${GITHUB_OUTPUT}"
-        printf 'hash=%s\n' "$(zig fetch .)" >> "${GITHUB_OUTPUT}"
+        user="$(mktemp -d)"
+        hash="$(zig fetch .)"
+        printf 'user=%s\n' "${user}" >> "${GITHUB_OUTPUT}"
+        printf 'hash=%s\n' "${hash}" >> "${GITHUB_OUTPUT}"
 
     - name: Clone ${{ inputs.user }}
+      env:
+        DIR: "${{ steps.vars.outputs.user }}"
+        URL: "${{ github.server_url }}/${{ github.repository_owner }}/${{ inputs.user }}"
       shell: ${{ env.shell }}
       run: |
-        git clone --recurse-submodules "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${{ inputs.user }}.git" "${{ steps.vars.outputs.user }}"
+        git clone --recurse-submodules "${URL}.git" "${DIR}"
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
+      env:
+        HASH: "${{ steps.vars.outputs.hash }}"
+        SHA: "${{ inputs.sha }}"
+        URL: "${{ github.server_url }}/${{ inputs.repository }}/archive"
       working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run: |
-        zon_url="$(grep -o "${GITHUB_SERVER_URL}/${{ inputs.repository }}/archive/.*\.tar\.gz" build.zig.zon)"
+        zon_url="$(grep -o "${URL}/.*\.tar\.gz" build.zig.zon)"
         zon_hash="$(zig fetch "${zon_url}")"
-        sed -i "s@${zon_url}@${GITHUB_SERVER_URL}/${{ inputs.repository }}/archive/${{ inputs.sha }}.tar.gz@;
-                s@${zon_hash}@${{ steps.vars.outputs.hash }}@" build.zig.zon
+        sed -i "s@${zon_url}@${URL}/${SHA}.tar.gz@;
+                s@${zon_hash}@${HASH}@" build.zig.zon
 
     - name: Test building ${{ inputs.user }}
-      if: ${{ inputs.test_build == 'true' }}
+      if: inputs.test_build == 'true'
       working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run:
         zig build
 
     - name: Test updating ${{ inputs.user }}
-      if: ${{ inputs.test_update == 'true' }}
+      if: inputs.test_update == 'true'
       working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run:
         zig build -Dupdate
 
     - name: Test fetching ${{ inputs.user }}
-      if: ${{ inputs.test_fetch == 'true' }}
+      if: inputs.test_fetch == 'true'
+      env:
+        GH_TOKEN: "${{ inputs.token }}"
       working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run:
         zig build -Dfetch
-      env:
-        GH_TOKEN: ${{ inputs.token }}
