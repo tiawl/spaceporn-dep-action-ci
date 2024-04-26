@@ -10,38 +10,38 @@ jobs:
     strategy:
       matrix:
         repo:
-          - user: vulkan.zig
-            dep: toolbox
-          - user: wayland.zig
-            dep: toolbox
-          - user: X11.zig
-            dep: toolbox
-          - user: glfw.zig
-            dep: toolbox
-          - user: glfw.zig
-            dep: vulkan.zig
-          - user: glfw.zig
-            dep: wayland.zig
-          - user: glfw.zig
-            dep: X11.zig
-          - user: cimgui.zig
-            dep: toolbox
-          - user: cimgui.zig
-            dep: glfw.zig
-          - user: spirv.zig
-            dep: toolbox
-          - user: glslang.zig
-            dep: toolbox
-          - user: shaderc.zig
-            dep: toolbox
-          - user: shaderc.zig
-            dep: spirv.zig
-          - user: shaderc.zig
-            dep: glslang.zig
-          - user: spaceporn
-            dep: cimgui.zig
-          - user: spaceporn
-            dep: shaderc.zig
+          - dep: toolbox
+            user: vulkan.zig
+          - dep: toolbox
+            user: wayland.zig
+          - dep: toolbox
+            user: X11.zig
+          - dep: toolbox
+            user: glfw.zig
+          - dep: toolbox
+            user: cimgui.zig
+          - dep: toolbox
+            user: spirv.zig
+          - dep: toolbox
+            user: glslang.zig
+          - dep: toolbox
+            user: shaderc.zig
+          - dep: vulkan.zig
+            user: glfw.zig
+          - dep: wayland.zig
+            user: glfw.zig
+          - dep: X11.zig
+            user: glfw.zig
+          - dep: glfw.zig
+            user: cimgui.zig
+          - dep: cimgui.zig
+            user: spaceporn
+          - dep: spirv.zig
+            user: shaderc.zig
+          - dep: glslang.zig
+            user: shaderc.zig
+          - dep: shaderc.zig
+            user: spaceporn
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
