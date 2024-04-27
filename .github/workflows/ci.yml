@@ -54,7 +54,7 @@ jobs:
         sha="$(git rev-parse HEAD)"
         printf 'sha=%s\n' "${sha}" >> "${GITHUB_OUTPUT}"
 
-    - uses: tiawl/spaceporn-dep-action-ci@ci
+    - uses: tiawl/spaceporn-dep-action-ci@bot
       with:
         repository: "${{ github.repository_owner }}/${{ matrix.repo.dep }}"
         sha: "${{ steps.prepare.outputs.sha }}"
