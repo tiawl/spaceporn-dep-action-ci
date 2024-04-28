@@ -3,7 +3,9 @@ name: cd pong
 on:
   repository_dispatch:
     types:
-      - ping
+      - ping-spaceporn-dep-action-env
+      - ping-spaceporn-dep-action-cd-ping
+      - ping-spaceporn-dep-action-cd-pong
 
 jobs:
   pong:
@@ -13,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: tiawl/spaceporn-dep-action-cd-pong@v1
-      if: contains(fromJSON('["spaceporn-dep-action-env","spaceporn-dep-action-cd-ping", "spaceporn-dep-action-cd-pong"]'), github.event.client_payload.dependency)
       with:
         repository: "${{ github.repository }}"
         dependency: "${{ github.event.client_payload.dependency }}"
