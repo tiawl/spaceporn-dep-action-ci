@@ -32,6 +32,10 @@ runs:
       with:
         version: ${{ env.zig_version }}
 
+    - uses: actions/checkout@v4
+      with:
+        repository: "${{ inputs.repository }}"
+
     - name: Install apt packages
       env:
         PACKAGES: "${{ env.apt_packages }}"

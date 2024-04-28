@@ -54,7 +54,8 @@ jobs:
         sha="$(git rev-parse HEAD)"
         printf 'sha=%s\n' "${sha}" >> "${GITHUB_OUTPUT}"
 
-    - uses: tiawl/spaceporn-dep-action-ci@bot
+    - uses: actions/checkout@v4
+    - uses: ./
       with:
         repository: "${{ github.repository_owner }}/${{ matrix.repo.dep }}"
         sha: "${{ steps.prepare.outputs.sha }}"
@@ -63,3 +64,4 @@ jobs:
         test_build: ${{ matrix.repo.user == 'spaceporn' && 'true' || 'false' }}
         test_update: ${{ matrix.repo.user == 'spaceporn' && 'false' || 'true' }}
         test_fetch: ${{ matrix.repo.user == 'spaceporn' && 'false' || 'true' }}
+    - uses: actions/checkout@v4
