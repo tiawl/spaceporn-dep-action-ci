@@ -55,9 +55,7 @@ runs:
       shell: ${{ env.shell }}
       run: |
         user="$(mktemp -d)"
-        hash="$(zig fetch .)"
         printf 'user=%s\n' "${user}" >> "${GITHUB_OUTPUT}"
-        printf 'hash=%s\n' "${hash}" >> "${GITHUB_OUTPUT}"
 
     - name: Clone ${{ inputs.user }}
       env:
@@ -69,16 +67,17 @@ runs:
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
       env:
-        HASH: "${{ steps.vars.outputs.hash }}"
         SHA: "${{ inputs.sha }}"
         URL: "${{ github.server_url }}/${{ inputs.repository }}/archive"
       working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run: |
-        zon_url="$(grep -o "${URL}/.*\.tar\.gz" build.zig.zon)"
-        zon_hash="$(zig fetch "${zon_url}")"
-        sed -i "s@${zon_url}@${URL}/${SHA}.tar.gz@;
-                s@${zon_hash}@${HASH}@" build.zig.zon
+        old_url="$(grep -o "${URL}/.*\.tar\.gz" build.zig.zon)"
+        old_hash="$(zig fetch "${old_url}")"
+        new_url="${URL}/${SHA}.tar.gz"
+        new_hash="$(zig fetch "${new_url}")"
+        sed -i "s@${old_url}@${new_url}@;
+                s@${old_hash}@${new_hash}@" build.zig.zon
 
     - name: Test building ${{ inputs.user }}
       if: inputs.test_build == 'true'
