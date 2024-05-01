@@ -40,6 +40,7 @@ runs:
         repository: "${{ inputs.repository }}"
 
     - name: Install apt packages
+      if: runner.os == 'LINUX'
       env:
         PACKAGES: "${{ env.apt_packages }}"
       shell: ${{ env.shell }}
