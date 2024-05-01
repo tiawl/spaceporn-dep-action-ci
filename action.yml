@@ -4,6 +4,9 @@ inputs:
   repository:
     description: 'Current repository'
     required: true
+  additional_zig_opts:
+    description: 'Additional Zig options'
+    required: false
   sha:
     description: 'Current commit sha'
     required: true
@@ -37,6 +40,7 @@ runs:
         repository: "${{ inputs.repository }}"
 
     - name: Install apt packages
+      if: runner.os == 'LINUX'
       env:
         PACKAGES: "${{ env.apt_packages }}"
       shell: ${{ env.shell }}
@@ -67,37 +71,42 @@ runs:
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
       env:
+        DIR: "${{ steps.vars.outputs.user }}"
         SHA: "${{ inputs.sha }}"
         URL: "${{ github.server_url }}/${{ inputs.repository }}/archive"
-      working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run: |
-        old_url="$(grep -o "${URL}/.*\.tar\.gz" build.zig.zon)"
+        old_url="$(grep -o "${URL}/.*\.tar\.gz" "${DIR}"/build.zig.zon)"
         old_hash="$(zig fetch "${old_url}")"
         new_url="${URL}/${SHA}.tar.gz"
         new_hash="$(zig fetch "${new_url}")"
         sed -i "s@${old_url}@${new_url}@;
-                s@${old_hash}@${new_hash}@" build.zig.zon
+                s@${old_hash}@${new_hash}@" "${DIR}"/build.zig.zon
 
     - name: Test building ${{ inputs.user }}
       if: inputs.test_build == 'true'
-      working-directory: ${{ steps.vars.outputs.user }}
+      env:
+        DIR: "${{ steps.vars.outputs.user }}"
+        OPTIONS: "${{ inputs.additional_zig_opts }}"
       shell: ${{ env.shell }}
       run:
-        zig build
+        zig build --build-file "${DIR}"/build.zig ${OPTIONS}
 
     - name: Test updating ${{ inputs.user }}
       if: inputs.test_update == 'true'
-      working-directory: ${{ steps.vars.outputs.user }}
+      env:
+        DIR: "${{ steps.vars.outputs.user }}"
+        OPTIONS: "${{ inputs.additional_zig_opts }}"
       shell: ${{ env.shell }}
       run:
-        zig build -Dupdate
+        zig build --build-file "${DIR}"/build.zig -Dupdate ${OPTIONS}
 
     - name: Test fetching ${{ inputs.user }}
       if: inputs.test_fetch == 'true'
       env:
+        DIR: "${{ steps.vars.outputs.user }}"
         GH_TOKEN: "${{ inputs.token }}"
-      working-directory: ${{ steps.vars.outputs.user }}
+        OPTIONS: "${{ inputs.additional_zig_opts }}"
       shell: ${{ env.shell }}
       run:
-        zig build -Dfetch
+        zig build --build-file "${DIR}"/build.zig -Dfetch ${OPTIONS}

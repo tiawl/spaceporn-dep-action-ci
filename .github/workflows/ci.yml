@@ -6,6 +6,74 @@ on:
       - trunk
 
 jobs:
+  test-cimgui:
+    strategy:
+      matrix:
+        dep:
+          - toolbox
+          - glfw.zig
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: "${{ github.repository_owner }}/${{ matrix.dep }}"
+
+    - name: Prepare CI
+      id: prepare
+      run: |
+        sha="$(git rev-parse HEAD)"
+        printf 'sha=%s\n' "${sha}" >> "${GITHUB_OUTPUT}"
+
+    - uses: actions/checkout@v4
+    - uses: ./
+      with:
+        repository: "${{ github.repository_owner }}/${{ matrix.dep }}"
+        additional_zig_opts: '-Dplatform=GLFW -Drenderer=Vulkan'
+        sha: "${{ steps.prepare.outputs.sha }}"
+        user: 'cimgui.zig'
+        token: "${{ github.token }}"
+        test_build: 'false'
+        test_update: 'true'
+        test_fetch: 'true'
+    - uses: actions/checkout@v4
+  test-spaceporn:
+    strategy:
+      matrix:
+        dep:
+          - cimgui.zig
+          - shaderc.zig
+        os:
+          - ubuntu-latest
+          - windows-latest
+        zig_opts:
+          - ''
+          - '-Ddev'
+          - '-Dturbo'
+    runs-on: "${{ matrix.os }}"
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: "${{ github.repository_owner }}/${{ matrix.dep }}"
+
+    - name: Prepare CI
+      id: prepare
+      shell: bash
+      run: |
+        sha="$(git rev-parse HEAD)"
+        printf 'sha=%s\n' "${sha}" >> "${GITHUB_OUTPUT}"
+
+    - uses: actions/checkout@v4
+    - uses: ./
+      with:
+        repository: "${{ github.repository_owner }}/${{ matrix.dep }}"
+        additional_zig_opts: "${{ matrix.zig_opts }}"
+        sha: "${{ steps.prepare.outputs.sha }}"
+        user: 'spaceporn'
+        token: "${{ github.token }}"
+        test_build: 'true'
+        test_update: 'false'
+        test_fetch: 'false'
+    - uses: actions/checkout@v4
   test:
     strategy:
       matrix:
@@ -19,8 +87,6 @@ jobs:
           - dep: toolbox
             user: glfw.zig
           - dep: toolbox
-            user: cimgui.zig
-          - dep: toolbox
             user: spirv.zig
           - dep: toolbox
             user: glslang.zig
@@ -32,16 +98,10 @@ jobs:
             user: glfw.zig
           - dep: X11.zig
             user: glfw.zig
-          - dep: glfw.zig
-            user: cimgui.zig
-          - dep: cimgui.zig
-            user: spaceporn
           - dep: spirv.zig
             user: shaderc.zig
           - dep: glslang.zig
             user: shaderc.zig
-          - dep: shaderc.zig
-            user: spaceporn
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -61,7 +121,7 @@ jobs:
         sha: "${{ steps.prepare.outputs.sha }}"
         user: "${{ matrix.repo.user }}"
         token: "${{ github.token }}"
-        test_build: ${{ matrix.repo.user == 'spaceporn' && 'true' || 'false' }}
-        test_update: ${{ matrix.repo.user == 'spaceporn' && 'false' || 'true' }}
-        test_fetch: ${{ matrix.repo.user == 'spaceporn' && 'false' || 'true' }}
+        test_build: 'false'
+        test_update: 'true'
+        test_fetch: 'true'
     - uses: actions/checkout@v4
