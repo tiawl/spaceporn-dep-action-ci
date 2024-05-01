@@ -66,6 +66,7 @@ jobs:
     - uses: ./
       with:
         repository: "${{ github.repository_owner }}/${{ matrix.dep }}"
+        additional_zig_opts: "${{ matrix.zig_opts }}"
         sha: "${{ steps.prepare.outputs.sha }}"
         user: 'spaceporn'
         token: "${{ github.token }}"
