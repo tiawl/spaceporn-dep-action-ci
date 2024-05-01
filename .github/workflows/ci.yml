@@ -57,6 +57,7 @@ jobs:
 
     - name: Prepare CI
       id: prepare
+      shell: bash
       run: |
         sha="$(git rev-parse HEAD)"
         printf 'sha=%s\n' "${sha}" >> "${GITHUB_OUTPUT}"
