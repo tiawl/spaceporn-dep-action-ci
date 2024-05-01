@@ -71,42 +71,42 @@ runs:
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
       env:
+        DIR: "${{ steps.vars.outputs.user }}"
         SHA: "${{ inputs.sha }}"
         URL: "${{ github.server_url }}/${{ inputs.repository }}/archive"
-      working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run: |
-        old_url="$(grep -o "${URL}/.*\.tar\.gz" build.zig.zon)"
+        old_url="$(grep -o "${URL}/.*\.tar\.gz" "${DIR}"/build.zig.zon)"
         old_hash="$(zig fetch "${old_url}")"
         new_url="${URL}/${SHA}.tar.gz"
         new_hash="$(zig fetch "${new_url}")"
         sed -i "s@${old_url}@${new_url}@;
-                s@${old_hash}@${new_hash}@" build.zig.zon
+                s@${old_hash}@${new_hash}@" "${DIR}"/build.zig.zon
 
     - name: Test building ${{ inputs.user }}
       if: inputs.test_build == 'true'
-      working-directory: ${{ steps.vars.outputs.user }}
       env:
+        DIR: "${{ steps.vars.outputs.user }}"
         OPTIONS: "${{ inputs.additional_zig_opts }}"
       shell: ${{ env.shell }}
       run:
-        zig build ${OPTIONS}
+        zig build --build-file "${DIR}"/build.zig ${OPTIONS}
 
     - name: Test updating ${{ inputs.user }}
       if: inputs.test_update == 'true'
-      working-directory: ${{ steps.vars.outputs.user }}
       env:
+        DIR: "${{ steps.vars.outputs.user }}"
         OPTIONS: "${{ inputs.additional_zig_opts }}"
       shell: ${{ env.shell }}
       run:
-        zig build -Dupdate ${OPTIONS}
+        zig build --build-file "${DIR}"/build.zig -Dupdate ${OPTIONS}
 
     - name: Test fetching ${{ inputs.user }}
       if: inputs.test_fetch == 'true'
       env:
+        DIR: "${{ steps.vars.outputs.user }}"
         GH_TOKEN: "${{ inputs.token }}"
         OPTIONS: "${{ inputs.additional_zig_opts }}"
-      working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run:
-        zig build -Dfetch ${OPTIONS}
+        zig build --build-file "${DIR}"/build.zig -Dfetch ${OPTIONS}
