@@ -4,6 +4,9 @@ inputs:
   repository:
     description: 'Current repository'
     required: true
+  additional_zig_opts:
+    description: 'Additional Zig options'
+    required: false
   sha:
     description: 'Current commit sha'
     required: true
@@ -82,22 +85,27 @@ runs:
     - name: Test building ${{ inputs.user }}
       if: inputs.test_build == 'true'
       working-directory: ${{ steps.vars.outputs.user }}
+      env:
+        OPTIONS: "${{ inputs.additional_zig_opts }}"
       shell: ${{ env.shell }}
       run:
-        zig build
+        zig build ${OPTIONS}
 
     - name: Test updating ${{ inputs.user }}
       if: inputs.test_update == 'true'
       working-directory: ${{ steps.vars.outputs.user }}
+      env:
+        OPTIONS: "${{ inputs.additional_zig_opts }}"
       shell: ${{ env.shell }}
       run:
-        zig build -Dupdate
+        zig build -Dupdate ${OPTIONS}
 
     - name: Test fetching ${{ inputs.user }}
       if: inputs.test_fetch == 'true'
       env:
         GH_TOKEN: "${{ inputs.token }}"
+        OPTIONS: "${{ inputs.additional_zig_opts }}"
       working-directory: ${{ steps.vars.outputs.user }}
       shell: ${{ env.shell }}
       run:
-        zig build -Dfetch
+        zig build -Dfetch ${OPTIONS}
