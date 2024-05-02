@@ -2,9 +2,9 @@
 
 A composite action triggered on pull request event. It clones the users of the currently modified repository, change its build.zig.zon with the SHA of the tested commit and run integration tests.
 
-## Disclaimer
+## Important note
 
-This package is not intented to be used outside of the [tiawl/spaceporn][1] dependencies chain. For this reason, there are no contributing file/rules on this repository. However feel free to open an issue if you have a question. We will be happy to answer.
+This composite action is not intented to be used outside of the [tiawl/spaceporn][1] dependencies chain. For this reason, there are no contributing file/rules on this repository. However feel free to open an issue if you have a question. We will be happy to answer.
 
 ## CICD reminder
 
