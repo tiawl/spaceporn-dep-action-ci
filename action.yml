@@ -87,7 +87,6 @@ runs:
     - name: Test fetching ${{ inputs.user }}
       if: inputs.test_fetch == 'true'
       env:
-        GH_TOKEN: "${{ inputs.token }}"
         OPTIONS: "${{ inputs.additional_zig_opts }}"
       shell: ${{ env.shell }}
       run:
