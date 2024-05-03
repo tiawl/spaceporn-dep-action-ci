@@ -23,10 +23,10 @@ jobs:
           - shaderc.zig
     runs-on: ubuntu-latest
     steps:
-    - uses: tiawl/spaceporn-action-cd-ping@v1.0.0
+    - uses: tiawl/spaceporn-action-cd-ping@v1.0.1
       with:
-        repository_name: "${{ github.event.repository.name }}"
+        from: "${{ github.event.repository.name }}"
         is_composite: 'true'
-        user: "${{ matrix.repo }}"
+        to: "${{ matrix.repo }}"
         tag: "${{ github.ref_name }}"
         token: "${{ secrets.PAT }}"
