@@ -53,7 +53,6 @@ runs:
     - uses: actions/checkout@v4
       with:
         repository: "${{ github.repository_owner }}/${{ inputs.user }}"
-        submodules: 'recursive'
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
       env:
