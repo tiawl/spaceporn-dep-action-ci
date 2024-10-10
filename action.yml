@@ -35,13 +35,21 @@ runs:
       with:
         version: ${{ env.zig_version }}
 
-    - name: Install packages
+    - name: Install apt packages
       if: runner.os == 'LINUX'
       env:
-        PACKAGES: "${{ env.packages }}"
+        PACKAGES: "${{ env.apt_packages }}"
       shell: ${{ env.shell }}
       run: |
         sudo apt-get install -y ${PACKAGES}
+
+    - name: Install pipx packages
+      if: runner.os == 'LINUX'
+      env:
+        PACKAGES: "${{ env.pipx_packages }}"
+      shell: ${{ env.shell }}
+      run: |
+        pipx install ${PACKAGES}
 
     - uses: actions/checkout@v4
       with:
