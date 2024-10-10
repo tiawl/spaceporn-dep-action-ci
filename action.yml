@@ -46,7 +46,7 @@ runs:
     - name: Install pip packages
       if: runner.os == 'LINUX'
       env:
-        PACKAGES: "${{ env.pipx_packages }}"
+        PACKAGES: "${{ env.pip_packages }}"
       shell: ${{ env.shell }}
       run: |
         pip3 install ${PACKAGES} --break-system-packages
