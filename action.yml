@@ -28,7 +28,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: tiawl/spaceporn-action-env@v1.0.4
+    - uses: tiawl/spaceporn-action-env@v1.0.2
 
     - name: Setup Zig
       uses: mlugg/setup-zig@v1
@@ -43,13 +43,13 @@ runs:
       run: |
         sudo apt-get install -y ${PACKAGES}
 
-    - name: Install pipx packages
+    - name: Install pip packages
       if: runner.os == 'LINUX'
       env:
         PACKAGES: "${{ env.pipx_packages }}"
       shell: ${{ env.shell }}
       run: |
-        pipx install ${PACKAGES}
+        pip3 install ${PACKAGES} --break-system-packages
 
     - uses: actions/checkout@v4
       with:
