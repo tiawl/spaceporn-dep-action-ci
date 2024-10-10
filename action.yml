@@ -44,7 +44,6 @@ runs:
         sudo apt-get install -y ${PACKAGES}
 
     - name: Install pip packages
-      if: runner.os == 'LINUX'
       env:
         PACKAGES: "${{ env.pip_packages }}"
       shell: ${{ env.shell }}
