@@ -28,7 +28,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: tiawl/spaceporn-action-env@v1.0.2
+    - uses: tiawl/spaceporn-action-env@v1.0.4
 
     - name: Setup Zig
       uses: goto-bus-stop/setup-zig@v2.2.0
