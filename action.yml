@@ -43,6 +43,10 @@ runs:
       run: |
         sudo apt-get install -y ${PACKAGES}
 
+    - uses: actions/checkout@v4
+      with:
+        repository: "${{ github.repository_owner }}/${{ inputs.user }}"
+
     - name: Activate python virtual env & install pip packages
       env:
         PACKAGES: "${{ env.pip_packages }}"
@@ -51,10 +55,6 @@ runs:
         python3 -m venv .venv
         source .venv/bin/activate
         pip install ${PACKAGES}
-
-    - uses: actions/checkout@v4
-      with:
-        repository: "${{ github.repository_owner }}/${{ inputs.user }}"
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
       env:
