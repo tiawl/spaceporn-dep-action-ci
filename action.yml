@@ -43,12 +43,14 @@ runs:
       run: |
         sudo apt-get install -y ${PACKAGES}
 
-    - name: Install pip packages
+    - name: Activate python virtual env & install pip packages
       env:
         PACKAGES: "${{ env.pip_packages }}"
       shell: ${{ env.shell }}
       run: |
-        pip3 install ${PACKAGES} --break-system-packages
+        python3 -m venv .venv
+        source .venv/bin/activate
+        pip install ${PACKAGES}
 
     - uses: actions/checkout@v4
       with:
