@@ -47,27 +47,21 @@ runs:
       with:
         repository: "${{ github.repository_owner }}/${{ inputs.user }}"
 
-    - name: Activate python virtual env & install pip packages for linux
-      if: runner.os == 'LINUX'
-      env:
-        PACKAGES: "${{ env.pip_packages }}"
-        RUNNER_TMP: "${{ runner.temp }}"
+    - name: Windows env
+      if: runner.os == 'WINDOWS'
       shell: ${{ env.shell }}
       run: |
-        python3 -m venv "${RUNNER_TMP}/venv"
-        source "${RUNNER_TMP}/venv/bin/activate"
-        printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
-        pip install ${PACKAGES}
+        printf 'ACTIVATE_DIR=Scripts\n' >> "${GITHUB_ENV}"
 
     - name: Activate python virtual env & install pip packages for Windows
-      if: runner.os == 'WINDOWS'
       env:
         PACKAGES: "${{ env.pip_packages }}"
         RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
+        printf 'OLD_PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         python3 -m venv "${RUNNER_TMP}/venv"
-        source "${RUNNER_TMP}/venv/Scripts/activate"
+        source "${RUNNER_TMP}/venv/${ACTIVATE_DIR:-bin}/activate"
         printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         pip install ${PACKAGES}
 
@@ -108,7 +102,7 @@ runs:
       run:
         zig build -Dfetch ${OPTIONS}
 
-    - name: Deactivate python virtual env
+    - name: Restore paths
       shell: ${{ env.shell }}
       run: |
-        deactivate
+        printf 'PATH=%s\n' "${OLD_PATH}" >> "${GITHUB_ENV}"
