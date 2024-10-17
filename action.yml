@@ -50,7 +50,7 @@ runs:
       run: |
         python3 -m venv /tmp/venv
         source /tmp/venv/bin/activate
-        pip install ${PACKAGES}
+        pip3 install ${PACKAGES}
 
     - uses: actions/checkout@v4
       with:
