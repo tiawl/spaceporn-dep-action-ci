@@ -59,7 +59,7 @@ runs:
       run: |
         pip install --upgrade pip
         python3.12 -m venv .venv
-        source env/bin/activate
+        source .venv/bin/activate
         printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         pip install ${PACKAGES}
 
