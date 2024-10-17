@@ -39,7 +39,6 @@ runs:
       if: runner.os == 'LINUX'
       env:
         PACKAGES: "${{ env.apt_packages }}"
-        RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
         sudo apt-get install -y ${PACKAGES}
@@ -60,6 +59,7 @@ runs:
     - name: Activate python virtual env & install pip packages
       env:
         PACKAGES: "${{ env.pip_packages }}"
+        RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
         python3 -m venv "${RUNNER_TMP}/venv"
