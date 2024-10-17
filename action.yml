@@ -47,14 +47,19 @@ runs:
       with:
         repository: "${{ github.repository_owner }}/${{ inputs.user }}"
 
-    - name: Activate python virtual env & install pip packages
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+
+    - name: Run Python commands
       env:
         PACKAGES: "${{ env.pip_packages }}"
-        RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
-        python3 -m venv .venv
-        source ./.venv/bin/activate
+        pip install --upgrade pip
+        python3.12 -m venv .venv
+        source env/bin/activate
         printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         pip install ${PACKAGES}
 
