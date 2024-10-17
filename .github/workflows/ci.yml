@@ -44,7 +44,6 @@ jobs:
         test_update: 'false'
         test_fetch: 'false'
     - uses: actions/checkout@v4
-      if: matrix.os != 'windows-latest'
   test:
     strategy:
       matrix:

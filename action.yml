@@ -107,3 +107,8 @@ runs:
       shell: ${{ env.shell }}
       run:
         zig build -Dfetch ${OPTIONS}
+
+    - name: Deactivate python virtual env
+      shell: ${{ env.shell }}
+      run: |
+        deactivate
