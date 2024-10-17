@@ -42,16 +42,11 @@ runs:
       shell: ${{ env.shell }}
       run: |
         sudo apt-get install -y ${PACKAGES}
+        printf 'ACTIVATE_DIR=bin\n' >> "${GITHUB_ENV}"
 
     - uses: actions/checkout@v4
       with:
         repository: "${{ github.repository_owner }}/${{ inputs.user }}"
-
-    - name: Windows env
-      if: runner.os == 'WINDOWS'
-      shell: ${{ env.shell }}
-      run: |
-        printf 'ACTIVATE_DIR=Scripts\n' >> "${GITHUB_ENV}"
 
     - name: Activate python virtual env & install pip packages
       env:
@@ -59,10 +54,8 @@ runs:
         RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
-        printf 'BEFORE_VENV_PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         python3 -m venv "${RUNNER_TMP}/venv"
-        source "${RUNNER_TMP}/venv/${ACTIVATE_DIR:-bin}/activate"
-        printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
+        source "${RUNNER_TMP}/venv/${ACTIVATE_DIR:-Scripts}/activate"
         pip install ${PACKAGES}
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
@@ -82,27 +75,28 @@ runs:
       if: inputs.test_build == 'true'
       env:
         OPTIONS: "${{ inputs.additional_zig_opts }}"
+        RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run:
+        source "${RUNNER_TMP}/venv/${ACTIVATE_DIR:-Scripts}/activate"
         zig build ${OPTIONS}
 
     - name: Test updating ${{ inputs.user }}
       if: inputs.test_update == 'true'
       env:
         OPTIONS: "${{ inputs.additional_zig_opts }}"
+        RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run:
+        source "${RUNNER_TMP}/venv/${ACTIVATE_DIR:-Scripts}/activate"
         zig build -Dupdate ${OPTIONS}
 
     - name: Test fetching ${{ inputs.user }}
       if: inputs.test_fetch == 'true'
       env:
         OPTIONS: "${{ inputs.additional_zig_opts }}"
+        RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run:
+        source "${RUNNER_TMP}/venv/${ACTIVATE_DIR:-Scripts}/activate"
         zig build -Dfetch ${OPTIONS}
-
-    - name: Restore paths
-      shell: ${{ env.shell }}
-      run: |
-        printf 'PATH=%s\n' "${BEFORE_VENV_PATH}" >> "${GITHUB_ENV}"
