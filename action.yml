@@ -51,7 +51,7 @@ runs:
         RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
-        wsl --install
+        wsl --install -d Ubuntu
         printf 'VENV_ACTIVATE_PATH=%s\n' "$(wslpath -a -w "$(wslpath -a -u "${RUNNER_TMP}")/venv/bin/activate")" >> "${GITHUB_ENV}"
 
     - name: Activate python virtual env & install pip packages
