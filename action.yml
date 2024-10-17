@@ -39,19 +39,13 @@ runs:
       if: runner.os == 'LINUX'
       env:
         PACKAGES: "${{ env.apt_packages }}"
-        RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
         sudo apt-get install -y ${PACKAGES}
-        printf 'VENV_ACTIVATE_PATH=%s\n' "${RUNNER_TMP}/venv/bin/activate" >> "${GITHUB_ENV}"
 
-    - name: Translate venv activate to windows path
-      if: runner.os == 'WINDOWS'
-      env:
-        RUNNER_TMP: "${{ runner.temp }}"
-      shell: ${{ env.shell }}
-      run: |
-        printf 'VENV_ACTIVATE_PATH=%s\n' "$(cygpath -w "$(cygpath -u "${RUNNER_TMP}")/venv/bin/activate")" >> "${GITHUB_ENV}"
+    - uses: actions/checkout@v4
+      with:
+        repository: "${{ github.repository_owner }}/${{ inputs.user }}"
 
     - name: Activate python virtual env & install pip packages
       env:
@@ -59,14 +53,10 @@ runs:
         RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
-        python3 -m venv "${RUNNER_TMP}/venv"
-        source "${VENV_ACTIVATE_PATH}"
+        python3 -m venv .venv
+        source ./.venv/bin/activate
         printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         pip install ${PACKAGES}
-
-    - uses: actions/checkout@v4
-      with:
-        repository: "${{ github.repository_owner }}/${{ inputs.user }}"
 
     - name: Prepare ${{ inputs.user }}/build.zig.zon
       env:
