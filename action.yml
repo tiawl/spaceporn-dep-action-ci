@@ -53,13 +53,13 @@ runs:
       run: |
         printf 'ACTIVATE_DIR=Scripts\n' >> "${GITHUB_ENV}"
 
-    - name: Activate python virtual env & install pip packages for Windows
+    - name: Activate python virtual env & install pip packages
       env:
         PACKAGES: "${{ env.pip_packages }}"
         RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
-        printf 'OLD_PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
+        printf 'BEFORE_VENV_PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         python3 -m venv "${RUNNER_TMP}/venv"
         source "${RUNNER_TMP}/venv/${ACTIVATE_DIR:-bin}/activate"
         printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
@@ -105,4 +105,4 @@ runs:
     - name: Restore paths
       shell: ${{ env.shell }}
       run: |
-        printf 'PATH=%s\n' "${OLD_PATH}" >> "${GITHUB_ENV}"
+        printf 'PATH=%s\n' "${BEFORE_VENV_PATH}" >> "${GITHUB_ENV}"
