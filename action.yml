@@ -48,8 +48,8 @@ runs:
         PACKAGES: "${{ env.pip_packages }}"
       shell: ${{ env.shell }}
       run: |
-        python3 -m venv /tmp/venv
-        source /tmp/venv/bin/activate
+        python3 -m venv .venv
+        source .venv/bin/activate
         printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         pip install ${PACKAGES}
 
