@@ -39,18 +39,31 @@ runs:
       if: runner.os == 'LINUX'
       env:
         PACKAGES: "${{ env.apt_packages }}"
+        RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
         sudo apt-get install -y ${PACKAGES}
 
-    - name: Activate python virtual env & install pip packages
+    - name: Set venv activate path
       env:
-        PACKAGES: "${{ env.pip_packages }}"
         RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
       run: |
-        python3 -m venv ${RUNNER_TMP}/venv
-        source ${RUNNER_TMP}/venv/bin/activate
+        printf 'VENV_ACTIVATE_PATH=%s\n' "${RUNNER_TMP}/venv/bin/activate" >> "${GITHUB_ENV}"
+
+    - name: Translate venv activate to windows path
+      if: runner.is == 'WINDOWS'
+      shell: ${{ env.shell }}
+      run: |
+        printf 'VENV_ACTIVATE_PATH=%s\n' "$(wslpath -a -w "${VENV_ACTIVATE_PATH}")" >> "${GITHUB_ENV}"
+
+    - name: Activate python virtual env & install pip packages
+      env:
+        PACKAGES: "${{ env.pip_packages }}"
+      shell: ${{ env.shell }}
+      run: |
+        python3 -m venv "${RUNNER_TMP}/venv"
+        source "${VENV_ACTIVATE_PATH}"
         printf 'PATH=%s\n' "${PATH}" >> "${GITHUB_ENV}"
         pip install ${PACKAGES}
 
