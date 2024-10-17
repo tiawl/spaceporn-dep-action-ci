@@ -46,7 +46,7 @@ runs:
         printf 'VENV_ACTIVATE_PATH=%s\n' "${RUNNER_TMP}/venv/bin/activate" >> "${GITHUB_ENV}"
 
     - name: Translate venv activate to windows path
-      if: runner.is == 'WINDOWS'
+      if: runner.os == 'WINDOWS'
       env:
         RUNNER_TMP: "${{ runner.temp }}"
       shell: ${{ env.shell }}
