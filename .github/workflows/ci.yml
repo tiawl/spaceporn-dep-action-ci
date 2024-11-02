@@ -64,6 +64,10 @@ jobs:
             user: glslang.zig
           - dep: toolbox
             user: shaderc.zig
+          - dep: toolbox
+            user: oniguruma.zig
+          - dep: toolbox
+            user: libjq.zig
           - dep: vulkan.zig
             user: glfw.zig
           - dep: wayland.zig
