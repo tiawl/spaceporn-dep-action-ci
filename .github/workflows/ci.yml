@@ -76,6 +76,8 @@ jobs:
             user: shaderc.zig
           - dep: glslang.zig
             user: shaderc.zig
+          - dep: oniguruma.zig
+            user: libjq.zig
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
