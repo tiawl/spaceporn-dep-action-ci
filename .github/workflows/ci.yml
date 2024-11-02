@@ -64,6 +64,10 @@ jobs:
             user: glslang.zig
           - dep: toolbox
             user: shaderc.zig
+          - dep: toolbox
+            user: oniguruma.zig
+          - dep: toolbox
+            user: libjq.zig
           - dep: vulkan.zig
             user: glfw.zig
           - dep: wayland.zig
@@ -76,6 +80,8 @@ jobs:
             user: shaderc.zig
           - dep: glslang.zig
             user: shaderc.zig
+          - dep: oniguruma.zig
+            user: libjq.zig
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
